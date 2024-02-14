@@ -1,12 +1,30 @@
-# Unity Custom Inspector Utility
+# Inspector Utility for Unity
 
-This custom Inspector  tool changes the way developers interact with scripts within the Unity Editor. Key features include:
+## Introduction
+The `Input` utility, part of the `com.Klazapp.Utility` namespace, is a key component that manages touch support and provides methods for enabling and disabling touch input.
 
-1. **Edit Script Button:** Directly access and edit scripts from the inspector, streamlining the development process.
-2. **Reveal Script Location:** Quickly locate scripts within your project hierarchy, improving navigation and file management.
-3. **Script Header Description:** Annotate scripts with descriptions, clarifying their purpose and functionality at a glance.
-4. **ToDo Header Description:** Keep track of pending tasks and development notes right within the inspector, ensuring nothing gets overlooked.
-5. **Read-Only Attribute:** Mark certain fields as read-only, preventing unintended modifications while allowing visibility in the inspector.
-6. **Custom Decorator Drawer:** Enhance property fields with descriptive tooltips, providing context and usage information to aid in development.
+## Features
+- Unity's Input utility includes support for handling touch input on mobile devices, such as smartphones and tablets. Developers can use Input.touches to access information about touch events, including position, phase, and delta movement.
+- In addition to touch input, Unity's Input utility also supports handling mouse input on desktop platforms. Developers can use Input.mouse* properties and methods to access information about mouse events, such as position, button clicks, and scrolling.
 
-Designed for developers seeking a more organized, informative, and efficient workflow in Unity, this tool optimizes the inspector interface to better align with the needs of sophisticated software projects."
+## Dependencies
+To use `Input`, certain dependencies are required. Ensure these are included in your Unity project.
+- **Unity Version**: Minimum Unity 2020.3 LTS.
+
+## Compatibility
+| Compatibility        | URP | BRP | HDRP |
+|----------------------|-----|-----|------|
+| Compatible           | ✔️  | ✔️  | ✔️   |
+
+## Installation
+1. Open the Unity Package Manager (`Window` > `Package Manager`).
+2. Click `+`, select `Add package from git URL...`, and enter `https://github.com/klazapp/Unity-Input-Public.git`.
+3. Unity will download and make the package available in your project.
+
+## Usage
+```csharp
+Write Something here
+```
+
+## To-Do List (Future Features)
+- 

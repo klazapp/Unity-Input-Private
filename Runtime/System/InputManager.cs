@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using com.Klazapp.Utility;
-using Unity.Burst.CompilerServices;
 using Unity.Mathematics;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
