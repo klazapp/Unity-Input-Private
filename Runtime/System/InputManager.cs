@@ -41,22 +41,28 @@ namespace com.Klazapp.Input
             EnhancedTouchSupport.Disable();
         }
         
-        public static void Update()
+        private void Update()
         {
 #if UNITY_EDITOR
             mousePosition = Mouse.current.position;
             mouseScrollAxis = Mouse.current.scroll;
             mouseLeftButtonPressed = Mouse.current.leftButton.isPressed;
 #else
-            if (Touch.activeTouches.Count == 0) 
-                return;
-
-            isActiveTouch1Down = Touch.activeTouches[0].inProgress;
-            activeTouch1Position = Touch.activeTouches[0].screenPosition;
-            
-            if (Touch.activeTouches.Count == 2)
+            if (EnhancedTouchSupport.enabled)
             {
-                activeTouch2Position = Touch.activeTouches[1].screenPosition;
+                if (Touch.activeTouches.Count == 0)
+                    return;
+
+                isActiveTouch1Down = Touch.activeTouches[0].inProgress;
+                activeTouch1Position = Touch.activeTouches[0].screenPosition;
+                if (Touch.activeTouches.Count == 2)
+                {
+                    activeTouch2Position = Touch.activeTouches[1].screenPosition;
+                }
+            }
+            else
+            {
+                EnhancedTouchSupport.Enable();
             }
 #endif
         }
@@ -110,7 +116,8 @@ namespace com.Klazapp.Input
 #if UNITY_EDITOR
             var scrollAmount = mouseScrollAxis?.y?.value;
 
-            if (!scrollAmount.HasValue) return 0f;
+            if (!scrollAmount.HasValue) 
+                return 0f;
 
             if (mathExtension.approximately(scrollAmount.Value, 0f)) 
                 return 0f;
