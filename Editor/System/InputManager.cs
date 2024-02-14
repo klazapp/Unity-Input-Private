@@ -42,7 +42,7 @@ namespace com.Klazapp.Input
             EnhancedTouchSupport.Disable();
         }
         
-        public static void Update()
+        private void Update()
         {
 #if UNITY_EDITOR
             mousePosition = Mouse.current.position;
