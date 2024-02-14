@@ -118,7 +118,7 @@ namespace com.Klazapp.Input
             var scrollAmount = mouseScrollAxis?.y?.value;
 
             if (!scrollAmount.HasValue) 
-            return 0f;
+                return 0f;
 
             if (mathExtension.approximately(scrollAmount.Value, 0f)) 
                 return 0f;
