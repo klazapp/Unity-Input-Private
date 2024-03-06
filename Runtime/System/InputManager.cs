@@ -1,33 +1,24 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
-using com.Klazapp.Utility;
 using Unity.Mathematics;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.Utilities;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 namespace com.Klazapp.Input
 {
-    [ScriptHeader("Manages touch support and provides methods for enabling and disabling touch input.")]
-    public class InputManager : MonoSingletonGlobal<InputManager>
+    public class InputManager : MonoBehaviour
     {
         #region Variables
-        //Touch Inputs
-        public static bool isActiveTouch1Down;
-        public static float2 activeTouch1Position;
-        public static float2 activeTouch2Position;
-        
-        //Mouse Inputs
-        private static Vector2Control mousePosition;
-        private static DeltaControl mouseScrollAxis;
-        public static bool mouseLeftButtonPressed;
-            
+        [SerializeField]
+        [Tooltip("Toggle this to set script's singleton status. Status will be set on script's OnAwake function")]
+        private ScriptBehavior scriptBehavior = ScriptBehavior.None;
+        public static InputManager Instance { get; private set; }
+
         //Pinch Distance
         private static float initPinchDistance;
-        private const float PINCH_THRESHOLD_AMOUNT = 0.5f;
+        private const float PINCH_THRESHOLD_AMOUNT = 0.5F;
         #endregion
 
         #region Lifecycle Flow
@@ -40,51 +31,35 @@ namespace com.Klazapp.Input
         {
             EnhancedTouchSupport.Disable();
         }
-        
-        private void Update()
-        {
-#if UNITY_EDITOR
-            mousePosition = Mouse.current.position;
-            mouseScrollAxis = Mouse.current.scroll;
-            mouseLeftButtonPressed = Mouse.current.leftButton.isPressed;
-#else
-            if (EnhancedTouchSupport.enabled)
-            {
-                if (Touch.activeTouches.Count == 0)
-                    return;
 
-                isActiveTouch1Down = Touch.activeTouches[0].inProgress;
-                activeTouch1Position = Touch.activeTouches[0].screenPosition;
-                if (Touch.activeTouches.Count == 2)
-                {
-                    activeTouch2Position = Touch.activeTouches[1].screenPosition;
-                }
-            }
-            else
-            {
-                EnhancedTouchSupport.Enable();
-            }
-#endif
+        private void Awake()
+        {
+            SetScriptBehaviour(scriptBehavior);
         }
         #endregion
         
         #region Public Access
-        public static float2 GetMousePosition()
+        public static (bool leftMouseButton, bool rightMouseButton) GetMouseButtonPressed()
         {
-            if (mousePosition != null)
-            {
-                var mouseXY = new float2(mousePosition.x.value, mousePosition.y.value);
-                return mouseXY;
-            }
-            else
-            {
-                return 0;
-            }
+            var mouse = Mouse.current;
+            return (mouse.leftButton.isPressed, mouse.rightButton.isPressed); 
         }
         
-        public static float GetPinchAmount(float pinchThreshold = PINCH_THRESHOLD_AMOUNT)
+        public static float2 GetMousePosition()
         {
-            var activeTouches = GetActiveTouches();
+            var mouse = Mouse.current;
+            return mouse != null ? new float2(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()) : float2.zero;
+        }
+
+        public static float GetMouseScrollAmount()
+        {
+            var mouse = Mouse.current;
+            return mouse != null ? mouse.scroll.ReadValue().y : 0f;
+        }
+
+        public static float GetTouchPinchAmount(float pinchThreshold = PINCH_THRESHOLD_AMOUNT)
+        {
+            var activeTouches = Touch.activeTouches;
 
             if (activeTouches.Count < 2)
                 return 0f;
@@ -92,7 +67,7 @@ namespace com.Klazapp.Input
             var touch1 = activeTouches[0];
             var touch2 = activeTouches[1];
 
-            var pinchDistance = math.distance(touch1.screenPosition , touch2.screenPosition);
+            var pinchDistance = math.distance(touch1.screenPosition, touch2.screenPosition);
 
             if (touch2.phase == TouchPhase.Began)
             {
@@ -102,38 +77,42 @@ namespace com.Klazapp.Input
             var pinchInputAmount = pinchDistance - initPinchDistance;
 
             //Check if the pinch distance change exceeds the threshold
-            if (!(math.abs(pinchInputAmount) > pinchThreshold))
+            if (math.abs(pinchInputAmount) <= pinchThreshold)
                 return 0f; 
             
             initPinchDistance = pinchDistance;
             
             return pinchInputAmount;
         }
-
-
-        public static float GetMouseScrollAmount()
+        
+        public static bool GetTouchFirstDown()
         {
-#if UNITY_EDITOR
-            var scrollAmount = mouseScrollAxis?.y?.value;
-
-            if (!scrollAmount.HasValue) 
-                return 0f;
-
-            if (mathExtension.approximately(scrollAmount.Value, 0f)) 
-                return 0f;
-
-            var scrollInputAmount = scrollAmount.Value;
-            return scrollInputAmount;
-#endif
-            return 0;
+            if (!EnhancedTouchSupport.enabled)
+                return false;
+           
+            return Touch.activeTouches.Count != 0 && Touch.activeTouches[0].inProgress;
         }
         #endregion
         
         #region Modules
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlyArray<Touch> GetActiveTouches()
+        private void SetScriptBehaviour(ScriptBehavior behavior)
         {
-            return Touch.activeTouches;
+            if (behavior is not (ScriptBehavior.Singleton or ScriptBehavior.PersistentSingleton)) 
+                return;
+            
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+                
+            Instance = this;
+
+            if (behavior == ScriptBehavior.PersistentSingleton)
+            {
+                DontDestroyOnLoad(this.gameObject);
+            }
         }
         #endregion
     }
