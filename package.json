@@ -1,6 +1,6 @@
 {
   "name": "com.klazapp.input",
-  "displayName": "Unity Input",
+  "displayName": "Unity Input Private",
   "version": "1.0.0",
   "unity": "2022.3",
   "description": "Enhance your Unity project with Klazapp's Input Manager, a comprehensive input handling system designed to integrate seamlessly with the Unity Input System. This package offers advanced features such as Enhanced Touch Support, Mouse Input Handling, Singleton Management, and Pinch Gesture Detection, making it ideal for developers looking to implement complex input setups across all platforms and rendering pipelines.",
