@@ -105,7 +105,6 @@ namespace com.Klazapp.Input
             {
                 if (isMouseDrag)
                 {
-                    Debug.Log("Mouse was dragging.");
                     // Handle end of drag here if needed
                 }
                 isMouseDrag = false;
