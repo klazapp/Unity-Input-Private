@@ -19,6 +19,21 @@ namespace com.Klazapp.Input
         //Pinch Distance
         private static float initPinchDistance;
         private const float PINCH_THRESHOLD_AMOUNT = 0.5F;
+        
+               //Touch Drag
+        private float2 initialTouchPosition;
+        private static bool isTouchDrag;
+        private const float touchDragThreshold = 30f; // Pixels, adjust this value based on your needs
+        private static float2 lastTouchPressedPosition; // Store the last tap position
+        private static bool touchPressedDetectedWithoutDrag = false;
+        
+        //Mouse Drag
+        private static bool isMouseDrag = false;
+        private float2 initialMousePosition;
+        private const float mouseDragThreshold = 5.0f; // Threshold to consider the movement a drag
+
+        private static bool touchPressedDown = false;
+        private static bool touchReleased = false;
         #endregion
 
         #region Lifecycle Flow
@@ -36,9 +51,112 @@ namespace com.Klazapp.Input
         {
             SetScriptBehaviour(scriptBehavior);
         }
-        #endregion
         
-        #region Public Access
+            private void Update()
+        {
+            touchPressedDown = false;
+            touchReleased = false;
+
+            touchPressedDetectedWithoutDrag = false; // Ensure it's reset each frame
+
+            foreach (var touch in Touch.activeTouches)
+            {
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        touchPressedDown = true;
+                        initialTouchPosition = touch.screenPosition;
+                        isTouchDrag = false;
+                        break;
+                    case TouchPhase.Moved:
+                        if (math.distance(initialTouchPosition, touch.screenPosition) > touchDragThreshold)
+                        {
+                            isTouchDrag = true;
+                        }
+                        break;
+                    case TouchPhase.Ended:
+                        if (!isTouchDrag)
+                        {
+                            touchPressedDetectedWithoutDrag = true;
+                            lastTouchPressedPosition = touch.screenPosition; // Set tap position
+                        }
+                        touchReleased = true;
+                        break;
+                }
+            }
+            
+            
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                // Record the starting position of the mouse when the left button is first pressed
+                initialMousePosition = Mouse.current.position.ReadValue();
+                isMouseDrag = false;
+            }
+            else if (Mouse.current.leftButton.isPressed)
+            {
+                // Check the distance the mouse has moved since the button was pressed
+                Vector2 currentMousePosition = Mouse.current.position.ReadValue();
+                if (!isMouseDrag && Vector2.Distance(initialMousePosition, currentMousePosition) > mouseDragThreshold)
+                {
+                    isMouseDrag = true; // Start dragging
+                }
+            }
+            else if (Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                if (isMouseDrag)
+                {
+                    Debug.Log("Mouse was dragging.");
+                    // Handle end of drag here if needed
+                }
+                isMouseDrag = false;
+            }
+        }
+		#endregion
+
+		#region Public Access
+ 		public static bool WasMouseButtonReleased()
+    	{
+        	return Mouse.current?.leftButton.wasReleasedThisFrame ?? false;
+    	}
+
+        public static bool IsMouseDrag()
+        {
+            return isMouseDrag;
+        }
+        
+        public static bool WasTouchPressedDown()
+        {
+            return touchPressedDown;
+        }
+
+        public static bool WasTouchReleased()
+        {
+            return touchReleased;
+        }
+        
+        public static float2 GetTapPositionIfNoDrag()
+        {
+            return lastTouchPressedPosition;
+        }
+
+        public static bool IsTouchDrag()
+        {
+            return isTouchDrag;
+        }
+        
+        public static float2 GetTapPosition()
+        {
+            return lastTouchPressedPosition;
+        }
+        
+        // Method to get the tap detection state
+        public static bool WasTapDetected()
+        {
+            var temp = touchPressedDetectedWithoutDrag;
+            touchPressedDetectedWithoutDrag = false; // Reset after checking to handle each tap as a new event
+            return temp;
+        }
+        
         public static (bool leftMouseButton, bool rightMouseButton) GetMouseButtonPressed()
         {
             var mouse = Mouse.current;
