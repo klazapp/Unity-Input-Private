@@ -114,12 +114,12 @@ namespace com.Klazapp.Input
                 }
             }
         }
-		#endregion
+	#endregion
 
-		#region Public Access
+	#region Public Access
  	public static bool IsMouseButtonReleased()
     	{
-        	return Mouse.current?.leftButton.wasReleasedThisFrame ?? false;
+            return Mouse.current?.leftButton.wasReleasedThisFrame ?? false;
     	}
 
         public static bool IsMouseDrag()
@@ -170,7 +170,17 @@ namespace com.Klazapp.Input
             var mouse = Mouse.current;
             return (mouse.leftButton.isPressed, mouse.rightButton.isPressed); 
         }
-        
+
+	public static bool IsMouseButtonUp()
+        {
+            return Mouse.current?.leftButton.wasReleasedThisFrame ?? false;
+        }
+
+        public static bool IsMouseButtonDown()
+        {
+            return Mouse.current?.leftButton.wasPressedThisFrame ?? false;
+        }
+	
         public static float2 GetMousePosition()
         {
             var mouse = Mouse.current;
@@ -217,6 +227,39 @@ namespace com.Klazapp.Input
                 return false;
            
             return Touch.activeTouches.Count != 0 && Touch.activeTouches[0].inProgress;
+        }
+
+ 	public static bool IsPointerOverUIElement(float2 screenPosition)
+        {
+            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            {
+                position = screenPosition
+            };
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+            return results.Count > 0;
+        }
+
+        public static bool IsOverUIObject()
+        {
+            var mouseOverUIObject = false;
+            
+            if (Mouse.current != null)
+            {
+                mouseOverUIObject = IsPointerOverUIElement(Mouse.current.position.ReadValue());
+            }
+
+            var touchOverUIObject = false;
+            if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
+            {
+                touchOverUIObject = IsPointerOverUIElement(Touchscreen.current.primaryTouch.position.ReadValue());
+            }
+
+            if (mouseOverUIObject || touchOverUIObject)
+                return true;
+            else
+                return false;
         }
         #endregion
         
