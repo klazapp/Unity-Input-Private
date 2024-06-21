@@ -86,28 +86,31 @@ namespace com.Klazapp.Input
             }
             
             
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+             if (Mouse.current != null)
             {
-                // Record the starting position of the mouse when the left button is first pressed
-                initialMousePosition = Mouse.current.position.ReadValue();
-                isMouseDrag = false;
-            }
-            else if (Mouse.current.leftButton.isPressed)
-            {
-                // Check the distance the mouse has moved since the button was pressed
-                Vector2 currentMousePosition = Mouse.current.position.ReadValue();
-                if (!isMouseDrag && Vector2.Distance(initialMousePosition, currentMousePosition) > mouseDragThreshold)
+                if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    isMouseDrag = true; // Start dragging
+                    // Record the starting position of the mouse when the left button is first pressed
+                    initialMousePosition = Mouse.current.position.ReadValue();
+                    isMouseDrag = false;
                 }
-            }
-            else if (Mouse.current.leftButton.wasReleasedThisFrame)
-            {
-                if (isMouseDrag)
+                else if (Mouse.current.leftButton.isPressed)
                 {
-                    // Handle end of drag here if needed
+                    // Check the distance the mouse has moved since the button was pressed
+                    Vector2 currentMousePosition = Mouse.current.position.ReadValue();
+                    if (!isMouseDrag && Vector2.Distance(initialMousePosition, currentMousePosition) > mouseDragThreshold)
+                    {
+                        isMouseDrag = true; // Start dragging
+                    }
                 }
-                isMouseDrag = false;
+                else if (Mouse.current.leftButton.wasReleasedThisFrame)
+                {
+                    if (isMouseDrag)
+                    {
+                        // Handle end of drag here if needed
+                    }
+                    isMouseDrag = false;
+                }
             }
         }
 		#endregion
