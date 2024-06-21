@@ -20,8 +20,8 @@ namespace com.Klazapp.Input
         private static float initPinchDistance;
         private const float PINCH_THRESHOLD_AMOUNT = 0.5F;
         
-               //Touch Drag
-        private float2 initialTouchPosition;
+        //Touch Drag
+     	private static float2 initialTouchPosition;
         private static bool isTouchDrag;
         private const float touchDragThreshold = 30f; // Pixels, adjust this value based on your needs
         private static float2 lastTouchPressedPosition; // Store the last tap position
@@ -52,7 +52,7 @@ namespace com.Klazapp.Input
             SetScriptBehaviour(scriptBehavior);
         }
         
-            private void Update()
+        private void Update()
         {
             touchPressedDown = false;
             touchReleased = false;
@@ -81,12 +81,13 @@ namespace com.Klazapp.Input
                             lastTouchPressedPosition = touch.screenPosition; // Set tap position
                         }
                         touchReleased = true;
+			isTouchDrag = false;
                         break;
                 }
             }
             
             
-             if (Mouse.current != null)
+            if (Mouse.current != null)
             {
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
@@ -116,7 +117,7 @@ namespace com.Klazapp.Input
 		#endregion
 
 		#region Public Access
- 		public static bool WasMouseButtonReleased()
+ 	public static bool IsMouseButtonReleased()
     	{
         	return Mouse.current?.leftButton.wasReleasedThisFrame ?? false;
     	}
@@ -126,17 +127,17 @@ namespace com.Klazapp.Input
             return isMouseDrag;
         }
         
-        public static bool WasTouchPressedDown()
+        public static bool IsTouchPressedDown()
         {
             return touchPressedDown;
         }
 
-        public static bool WasTouchReleased()
+        public static bool IsTouchPressedUp()
         {
             return touchReleased;
         }
         
-        public static float2 GetTapPositionIfNoDrag()
+        public static float2 GetTouchPositionIfNoDrag()
         {
             return lastTouchPressedPosition;
         }
@@ -146,13 +147,18 @@ namespace com.Klazapp.Input
             return isTouchDrag;
         }
         
-        public static float2 GetTapPosition()
+        public static float2 GetTouchPosition()
         {
             return lastTouchPressedPosition;
         }
-        
+
+	public static float2 GetInitialTouchPosition()
+        {
+            return initialTouchPosition;
+        }
+
         // Method to get the tap detection state
-        public static bool WasTapDetected()
+        public static bool IsTouchDetected()
         {
             var temp = touchPressedDetectedWithoutDrag;
             touchPressedDetectedWithoutDrag = false; // Reset after checking to handle each tap as a new event
