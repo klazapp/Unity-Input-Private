@@ -243,26 +243,27 @@ namespace com.Klazapp.Input
             return results.Count > 0;
         }
 
-        public static bool IsOverUIObject()
-        {
-            var mouseOverUIObject = false;
-            
-            if (Mouse.current != null)
-            {
-                mouseOverUIObject = IsPointerOverUIElement(Mouse.current.position.ReadValue());
-            }
-
-            var touchOverUIObject = false;
+	public static bool IsTouchOverUIObject()
+ 	{
+  	    var touchOverUIObject = false;
             if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed)
             {
                 touchOverUIObject = IsPointerOverUIElement(Touchscreen.current.primaryTouch.position.ReadValue());
             }
 
-            if (mouseOverUIObject || touchOverUIObject)
-                return true;
-            else
-                return false;
-        }
+     	    return touchOverUIObject;
+  	}
+
+   	public static bool IsMouseOverUIObject()
+ 	{
+  	    var mouseOverUIObject = false;
+            if (Mouse.current != null)
+            {
+                mouseOverUIObject = IsPointerOverUIElement(Mouse.current.position.ReadValue());
+            }
+	    
+     	    return mouseOverUIObject;
+  	}
         #endregion
         
         #region Modules
